@@ -1,8 +1,8 @@
 """Check a downloaded file against a published SHA-256 checksum. It only reads the file.
 
 Usage:  python checkfile.py FILE EXPECTED_SHA256
-A match means the file's bytes are the same as the file the checksum was made from.
-It does not tell you the publisher is trustworthy or the file is safe.
+A match is strong evidence the file has the same content as the file the checksum was made from.
+It is not an absolute guarantee, and it does not show who made the file or that it is safe.
 """
 import hashlib
 import re
