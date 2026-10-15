@@ -1,0 +1,25 @@
+name: test
+on: [push, workflow_dispatch]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest -v
+      - run: python make_sample.py
+      - name: Good file matches and damaged file does not
+        shell: python
+        run: |
+          import hashlib, subprocess, sys
+          want = hashlib.sha256(open("sample/installer.bin", "rb").read()).hexdigest()
+          good = subprocess.run([sys.executable, "checkfile.py", "sample/installer.bin", want.upper()], capture_output=True, text=True)
+          bad = subprocess.run([sys.executable, "checkfile.py", "sample/installer-damaged.bin", want], capture_output=True, text=True)
+          assert good.returncode == 0 and "MATCH:" in good.stdout, good.stdout
+          assert bad.returncode == 1 and "NO MATCH" in bad.stdout, bad.stdout
+          print("Match and no-match checks passed.")
