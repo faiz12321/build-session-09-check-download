@@ -1,0 +1,57 @@
+### CMD: python --version
+Python 3.12.3
+### EXIT: 0
+
+### CMD: python make_sample.py
+Made sample/installer.bin and sample/installer-damaged.bin
+### EXIT: 0
+
+### CMD: python make_sample.py
+Stopped: sample already exists. Nothing was replaced or deleted.
+### EXIT: 1
+
+### CMD: python checkfile.py sample/installer.bin D72E2D8F750C656519A88F50ED63E38603F967F6E38F6C5E1AB06453E5B3782C
+BAD
+### EXIT: 0
+
+### CMD: python checkfile.py sample/installer.bin D72E2D8F750C656519A88F50ED63E38603F967F6E38F6C5E1AB06453E5B3782C
+File:     sample/installer.bin
+Expected: d72e2d8f750c656519a88f50ed63e38603f967f6e38f6c5e1ab06453e5b3782c
+Actual:   d72e2d8f750c656519a88f50ed63e38603f967f6e38f6c5e1ab06453e5b3782c
+MATCH: the file has the SHA-256 you gave.
+### EXIT: 0
+
+### CMD: python checkfile.py sample/installer-damaged.bin d72e2d8f750c656519a88f50ed63e38603f967f6e38f6c5e1ab06453e5b3782c
+File:     sample/installer-damaged.bin
+Expected: d72e2d8f750c656519a88f50ed63e38603f967f6e38f6c5e1ab06453e5b3782c
+Actual:   f25a33e010ddc4d104b4270e366ed5e2591256af02115b41070671a2b7f9c90e
+NO MATCH: the file does not have the SHA-256 you gave. It may be damaged, incomplete or a different file. Do not use it until you know which.
+### EXIT: 1
+
+### CMD: python checkfile.py sample/installer.bin 123
+The expected checksum must be 64 characters from 0-9 and a-f (SHA-256). Yours has 3 characters.
+### EXIT: 2
+
+### CMD: python -m unittest -v
+test_accepts_upper_case_spaces_and_prefix (test_checkfile.CleanTests.test_accepts_upper_case_spaces_and_prefix) ... ok
+test_refuses_wrong_length_or_characters (test_checkfile.CleanTests.test_refuses_wrong_length_or_characters) ... ok
+test_empty_file (test_checkfile.HashTests.test_empty_file) ... ok
+test_file_bigger_than_one_chunk (test_checkfile.HashTests.test_file_bigger_than_one_chunk) ... ok
+test_known_value (test_checkfile.HashTests.test_known_value) ... ok
+test_bad_checksum_is_refused_before_reading (test_checkfile.MainTests.test_bad_checksum_is_refused_before_reading) ... ok
+test_file_not_changed (test_checkfile.MainTests.test_file_not_changed) ... ok
+test_match (test_checkfile.MainTests.test_match) ... ok
+test_missing_file_and_folder_and_usage (test_checkfile.MainTests.test_missing_file_and_folder_and_usage) ... ok
+test_one_changed_byte_does_not_match (test_checkfile.MainTests.test_one_changed_byte_does_not_match) ... ok
+test_sample_files (test_checkfile.MainTests.test_sample_files) ... ok
+test_truncated_file_does_not_match (test_checkfile.MainTests.test_truncated_file_does_not_match) ... ok
+test_cli_refuses_without_replacing (test_checkfile.SetupSafetyTests.test_cli_refuses_without_replacing) ... ok
+test_existing_file_preserved (test_checkfile.SetupSafetyTests.test_existing_file_preserved) ... ok
+test_existing_folder_preserves_nested_bytes_and_metadata (test_checkfile.SetupSafetyTests.test_existing_folder_preserves_nested_bytes_and_metadata) ... ok
+test_repeat_setup_preserves_generated_bytes_and_metadata (test_checkfile.SetupSafetyTests.test_repeat_setup_preserves_generated_bytes_and_metadata) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.050s
+
+OK
+### EXIT: 0
