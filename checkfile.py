@@ -5,6 +5,29 @@ A match is strong evidence the file has the same content as the file the checksu
 It is not an absolute guarantee, and it does not show who made the file or that it is safe.
 """
 import hashlib
+import stat
+from pathlib import Path
+
+def safe_input(value, directory=False):
+    path = Path(value).absolute()
+    if '..' in path.parts:
+        raise OSError('Parent-traversal paths are unsupported.')
+    for part in [*reversed(path.parents), path]:
+        info = part.lstat()
+        if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
+            raise OSError('Links/reparse points are unsupported.')
+    info = path.lstat()
+    if directory:
+        if not stat.S_ISDIR(info.st_mode):
+            raise NotADirectoryError('Expected an ordinary directory.')
+    elif not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+        raise OSError('Expected an ordinary singly linked file.')
+    return path
+
+
+
+
+
 import re
 import sys
 
@@ -24,7 +47,7 @@ def clean(expected):
 
 def file_sha256(path):
     digest = hashlib.sha256()
-    with open(path, "rb") as handle:
+    with open(safe_input(path), "rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
