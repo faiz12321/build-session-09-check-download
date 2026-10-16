@@ -6,7 +6,7 @@ A small read-only Python tool built step by step. Give it a file and the SHA-256
 
     python make_sample.py                                  # makes made-up files in sample/
     python checkfile.py sample/installer.bin CHECKSUM      # replace CHECKSUM with the 64-character value
-    python -m unittest -v                                  # twelve automated tests
+    python -m unittest -v                                  # 16 temporary-fixture tests
 
 On Windows, if `python` is not found, use `py`. The lesson shows the exact checksum for the made-up file.
 
@@ -15,6 +15,12 @@ On Windows, if `python` is not found, use `py`. The lesson shows the exact check
 - `checkfile.py` - the tool
 - `make_sample.py` - makes a made-up file and a damaged copy
 - `test_checkfile.py` - tests
+
+## Setup safety and evidence
+
+Setup creates only a new sample folder and exclusively writes its fictional byte files. It refuses any existing path rather than resetting or replacing data. Start in a new empty lesson folder. The .bin files contain repeated text, not real installers. Four new setup collision/repeat tests preserve bytes and modification times, including nested unrelated data. The checker is unchanged. Source paths can follow links. Reports expose paths; keep private output private.
+
+Two Windows and two Ubuntu recordings pass all 16 tests. Each pair differs only in unittest time. Displays use the first Windows recording. Version and test-name rendering can differ between platforms. The recorder creates the visible first/final file versions in its unique temporary folder and removes only that folder. Setup itself refuses a repeat run.
 
 ## Notes
 
