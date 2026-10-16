@@ -1,33 +1,17 @@
-# Check a downloaded file against its SHA-256 checksum
+# Check a fictional download hash
 
-A small read-only Python tool built step by step. Give it a file and the SHA-256 checksum a publisher lists, and it says whether the file has that SHA-256. It only reads the file.
+Two Windows and two Ubuntu full replays use the exact visible source versions. Final 28 small fixture tests pass (Unix pipe skips on Windows); symlinks can skip where unavailable. Displayed stdout is first Windows run, not mixed or normalized. Pair differences are unittest time. Initial simple prototype stays labeled fictional-sample-only before whole-file replacement.
+Only link-related final-reader behavior changes: refuse symbolic/reparse input or ancestors, hardlinks, special files and traversal before opening. Metadata/read errors return 2. Original checksum cleaning, match exit 0, mismatch exit 1 and invalid-input exit 2 remain. SHA-256 match is evidence of content identity, not authenticity, provenance or safety to execute. Get the expected digest from a separately trusted source.
+Setup exclusively creates a NEW fictional installer and truncated copy, both repeated text, not real programs. Existing paths refuse; linked ancestors/traversal now refuse too. No reset/delete. Recorder removes only its own temporary fixture folder.
+The final checker has no write/move/delete/network code. Chunked reading is not a total time/resource limit. Stop editors/sync; no atomic snapshot or hostile-race defense. Paths can be private. Small fixtures do not establish behavior on every filesystem. No desktop Windows/macOS or real installer recording. Decisions and feedback are teaching text, not recorded output.
 
-## Run it
+Save source in a NEW empty local lesson folder. Run python make_sample.py, then the visible checksum command and python -m unittest -v.
 
-    python make_sample.py                                  # makes made-up files in sample/
-    python checkfile.py sample/installer.bin CHECKSUM      # replace CHECKSUM with the 64-character value
-    python -m unittest -v                                  # 16 temporary-fixture tests
+MIT code; Python separately licensed/not included.
 
-On Windows, if `python` is not found, use `py`. The lesson shows the exact checksum for the made-up file.
+## Paired recordings
 
-## Files
+- Windows: https://github.com/faiz12321/lesson-lab/actions/runs/38969453334
+- Ubuntu: https://github.com/faiz12321/lesson-lab/actions/runs/38969974786
 
-- `checkfile.py` - the tool
-- `make_sample.py` - makes a made-up file and a damaged copy
-- `test_checkfile.py` - tests
-
-## Setup safety and evidence
-
-Setup creates only a new sample folder and exclusively writes its fictional byte files. It refuses any existing path rather than resetting or replacing data. Start in a new empty lesson folder. The .bin files contain repeated text, not real installers. Four new setup collision/repeat tests preserve bytes and modification times, including nested unrelated data. The checker is unchanged. Source paths can follow links. Reports expose paths; keep private output private.
-
-Two Windows and two Ubuntu recordings pass all 16 tests. Each pair differs only in unittest time. Displays use the first Windows recording. Version and test-name rendering can differ between platforms. The recorder creates the visible first/final file versions in its unique temporary folder and removes only that folder. Setup itself refuses a repeat run.
-
-## Notes
-
-- A match means the file has the SHA-256 you typed. It does not show the checksum is trustworthy (get it from a source you trust, not only the page that hosts the file), and it does not show the file is safe.
-- Only SHA-256 is checked. Python's hashlib documentation says some algorithms, including MD5 and SHA-1, have known hash collision weaknesses (https://docs.python.org/3/library/hashlib.html).
-- Capitals, surrounding spaces and a leading `sha256:` are tidied. Anything that is not 64 characters from 0-9 and a-f is refused.
-- Microsoft documents a PowerShell command, Get-FileHash (https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash). It was not run for this lesson, so no claim is made that it matches on your PC.
-- Tested only on made-up files and small test files, not on real installers or very large files. Python 3.10 (Linux) and, by GitHub Actions, Python 3.12 on Windows and Ubuntu. Not tested on a Windows 10 or 11 desktop.
-- The practice files are made up. Educational example, no warranty. Use at your own risk.
-- Code is MIT licensed (see LICENSE). Python is a separate project with its own license; this repository does not include it.
+Python filesystem reference: https://docs.python.org/3/library/os.html
