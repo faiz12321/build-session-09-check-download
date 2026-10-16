@@ -80,7 +80,7 @@ class MainTests(Base):
         self.assertEqual(self.run_main([])[0], 2)
 
     def test_sample_files(self):
-        good = make_sample.make(self.tmp.name)
+        good = make_sample.make(Path(self.tmp.name) / "new-sample")
         want = hashlib.sha256(good.read_bytes()).hexdigest()
         self.assertEqual(self.run_main([str(good), want])[0], 0)
         self.assertEqual(self.run_main([str(good.with_name("installer-damaged.bin")), want])[0], 1)
@@ -89,6 +89,50 @@ class MainTests(Base):
         before = (self.path.read_bytes(), os.stat(self.path).st_mtime_ns)
         self.run_main([str(self.path), ABC])
         self.assertEqual(before, (self.path.read_bytes(), os.stat(self.path).st_mtime_ns))
+
+
+class SetupSafetyTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.sample = self.root / 'sample'
+
+    def test_existing_folder_preserves_nested_bytes_and_metadata(self):
+        (self.sample / 'nested').mkdir(parents=True)
+        keep = self.sample / 'nested' / 'keep.bin'
+        keep.write_bytes(b'KEEP')
+        before = (keep.read_bytes(), keep.stat().st_mtime_ns)
+        with self.assertRaises(FileExistsError):
+            make_sample.make(self.sample)
+        self.assertEqual(before, (keep.read_bytes(), keep.stat().st_mtime_ns))
+        self.assertEqual(sorted(p.relative_to(self.sample).as_posix() for p in self.sample.rglob('*')), ['nested','nested/keep.bin'])
+
+    def test_existing_file_preserved(self):
+        self.sample.write_bytes(b'KEEP')
+        before = (self.sample.read_bytes(), self.sample.stat().st_mtime_ns)
+        with self.assertRaises(FileExistsError):
+            make_sample.make(self.sample)
+        self.assertEqual(before, (self.sample.read_bytes(), self.sample.stat().st_mtime_ns))
+
+    def test_repeat_setup_preserves_generated_bytes_and_metadata(self):
+        make_sample.make(self.sample)
+        before = {p.name:(p.read_bytes(),p.stat().st_mtime_ns) for p in self.sample.iterdir()}
+        with self.assertRaises(FileExistsError):
+            make_sample.make(self.sample)
+        self.assertEqual(before, {p.name:(p.read_bytes(),p.stat().st_mtime_ns) for p in self.sample.iterdir()})
+
+    def test_cli_refuses_without_replacing(self):
+        import shutil, subprocess, sys
+        script = self.root / 'make_sample.py'
+        shutil.copyfile(Path(__file__).resolve().parent / 'make_sample.py', script)
+        self.sample.mkdir()
+        keep = self.sample / 'keep'
+        keep.write_bytes(b'KEEP')
+        result = subprocess.run([sys.executable,str(script)],capture_output=True,text=True)
+        self.assertEqual(result.returncode,1)
+        self.assertIn('Nothing was replaced or deleted',result.stderr)
+        self.assertEqual(keep.read_bytes(),b'KEEP')
 
 
 if __name__ == "__main__":
